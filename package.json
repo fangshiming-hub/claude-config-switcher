@@ -1,0 +1,59 @@
+{
+  "name": "claude-config-switch",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "A CLI tool for quickly switching between different Claude configuration files",
+  "main": "lib/config-manager.js",
+  "bin": {
+    "ccs": "./bin/cli.js",
+    "claude-config-switch": "./bin/cli.js"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "templates/",
+    "LICENSE"
+  ],
+  "scripts": {
+    "start": "node bin/cli.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint .",
+    "prepublishOnly": "npm test && npm run lint"
+  },
+  "keywords": [
+    "claude",
+    "configuration",
+    "switch",
+    "cli",
+    "settings",
+    "environment"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/claude-config-switch.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/claude-config-switch/issues"
+  },
+  "homepage": "https://github.com/yourusername/claude-config-switch#readme",
+  "dependencies": {
+    "prompts": "^2.4.2",
+    "chalk": "^4.1.2",
+    "yargs": "^17.7.2",
+    "fs-extra": "^11.1.1",
+    "json-diff": "^1.0.6",
+    "simple-git": "^3.22.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "eslint": "^8.56.0",
+    "@types/node": "^20.11.5"
+  },
+  "engines": {
+    "node": ">=14.18.0"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "apiKey": "your-api-key-here",
+  "model": "claude-3-opus-20240229",
+  "temperature": 0.9,
+  "maxTokens": 4000,
+  "systemPrompt": "You are an advanced AI assistant with creative capabilities.",
+  "timeout": 60000,
+  "streaming": true,
+  "tools": ["web_search", "code_interpreter"]
+}

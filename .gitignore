@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Test coverage
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+
+# Coverage directory used by tools like istanbul
+.nyc_output
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+Thumbs.db
+.DS_Store
+
+# Local config
+config.json
+.history.json
+
+# Build outputs
+dist/
+build/

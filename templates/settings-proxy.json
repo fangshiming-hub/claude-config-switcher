@@ -1,0 +1,19 @@
+{
+  "apiKey": "your-proxy-api-key",
+  "model": "claude-3-sonnet-20240229",
+  "temperature": 0.7,
+  "maxTokens": 2000,
+  "systemPrompt": "You are an AI assistant working through a proxy server.",
+  "timeout": 45000,
+  "proxy": {
+    "host": "proxy.company.com",
+    "port": 8080,
+    "protocol": "https",
+    "auth": {
+      "username": "proxy-user",
+      "password": "proxy-password"
+    }
+  },
+  "retryAttempts": 3,
+  "retryDelay": 1000
+}
