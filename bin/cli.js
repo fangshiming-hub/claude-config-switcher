@@ -159,7 +159,7 @@ async function handleInteractiveMode(configManager) {
     return;
   }
   
-  await switchConfig(configManager, response.selectedConfig);
+  await switchConfig(configManager, response.selectedConfig, null);
 }
 
 /**
@@ -340,9 +340,23 @@ async function switchConfig(configManager, config) {
   try {
     console.log(chalk.blue('🔄 正在切换配置...'));
 
-    await configManager.switchConfig(config);
+    const result = await configManager.switchConfig(config);
 
-    console.log(chalk.green('✅ 配置切换成功!'));
+    // 打印切换前的配置
+    if (result.previousConfig) {
+      console.log(chalk.cyan('\n📄 切换前配置:'));
+      console.log(chalk.gray(JSON.stringify(result.previousConfig, null, 2)));
+    } else {
+      console.log(chalk.cyan('\n📄 切换前配置: 无（目标文件不存在）'));
+    }
+
+    // 打印切换后的配置
+    console.log(chalk.cyan('\n📄 切换后配置:'));
+    console.log(chalk.green(JSON.stringify(result.currentConfig, null, 2)));
+
+    console.log(chalk.green('\n✅ 配置切换成功!'));
+    console.log(chalk.gray(`从: ${result.source.name}`));
+    console.log(chalk.gray(`到: ${result.target.name}`));
 
   } catch (error) {
     console.error(chalk.red('❌ 配置切换失败:'), error.message);
