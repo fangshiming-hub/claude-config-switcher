@@ -1,5 +1,5 @@
 {
-  "name": "claude-config-switch",
+  "name": "claude-config-switcher",
   "version": "1.0.0",
   "type": "module",
   "description": "A CLI tool for quickly switching between different Claude configuration files",
@@ -30,16 +30,16 @@
     "settings",
     "environment"
   ],
-  "author": "Your Name",
+  "author": "weishiren",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/claude-config-switch.git"
+    "url": "https://github.com/fangshiming-hub/claude-config-switcher.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/claude-config-switch/issues"
+    "url": "https://github.com/fangshiming-hub/claude-config-switcher/issues"
   },
-  "homepage": "https://github.com/yourusername/claude-config-switch#readme",
+  "homepage": "https://github.com/fangshiming-hub/claude-config-switcher#readme",
   "dependencies": {
     "prompts": "^2.4.2",
     "chalk": "^4.1.2",

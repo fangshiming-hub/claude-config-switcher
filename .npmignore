@@ -1,0 +1,39 @@
+# Test files
+__tests__/
+*.test.js
+jest.config.js
+coverage/
+
+# Development files
+.eslintrc.json
+.gitignore
+.vscode/
+.idea/
+.qoder/
+
+# Documentation (already in files array)
+CHANGELOG.md
+
+# Git
+.git/
+.gitattributes
+
+# Logs
+*.log
+npm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local config files
+config.json
+.history.json
+settings.json
+settings-*.json
+!templates/settings-*.json

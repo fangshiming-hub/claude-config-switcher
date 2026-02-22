@@ -339,17 +339,11 @@ async function handleTemplateGeneration() {
 async function switchConfig(configManager, config) {
   try {
     console.log(chalk.blue('🔄 正在切换配置...'));
-    
-    const result = await configManager.switchConfig(config);
-    
+
+    await configManager.switchConfig(config);
+
     console.log(chalk.green('✅ 配置切换成功!'));
-    if (result.validation.warnings.length > 0) {
-      console.log(chalk.yellow('\n⚠️  配置警告:'));
-      result.validation.warnings.forEach(warning => {
-        console.log(chalk.yellow(`  - ${warning}`));
-      });
-    }
-    
+
   } catch (error) {
     console.error(chalk.red('❌ 配置切换失败:'), error.message);
     throw error;
