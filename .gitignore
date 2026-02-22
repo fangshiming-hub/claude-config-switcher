@@ -34,3 +34,5 @@ config.json
 # Build outputs
 dist/
 build/
+
+.npmrc
