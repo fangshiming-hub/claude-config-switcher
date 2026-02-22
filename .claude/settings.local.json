@@ -1,7 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm link:*)"
+      "Bash(npm link:*)",
+      "Bash(head:*)",
+      "Bash(npm test:*)",
+      "Bash(npm publish:*)",
+      "Bash(npm config:*)",
+      "Bash(npm login:*)"
     ]
   }
 }

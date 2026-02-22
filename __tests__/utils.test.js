@@ -52,7 +52,7 @@ describe('Utils', () => {
   describe('getPackageRoot', () => {
     test('应该返回正确的包根目录', () => {
       const result = Utils.getPackageRoot();
-      expect(result).toContain('claude-config-change');
+      expect(result).toContain('claude-config-switcher');
     });
   });
 

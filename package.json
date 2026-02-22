@@ -1,5 +1,5 @@
 {
-  "name": "claude-config-switcher",
+  "name": "@weishiren/claude-config-switcher",
   "version": "1.0.0",
   "type": "module",
   "description": "A CLI tool for quickly switching between different Claude configuration files",
@@ -16,9 +16,9 @@
   ],
   "scripts": {
     "start": "node bin/cli.js",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
+    "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
     "lint": "eslint .",
     "prepublishOnly": "npm test && npm run lint"
   },
@@ -44,9 +44,7 @@
     "prompts": "^2.4.2",
     "chalk": "^4.1.2",
     "yargs": "^17.7.2",
-    "fs-extra": "^11.1.1",
-    "json-diff": "^1.0.6",
-    "simple-git": "^3.22.0"
+    "fs-extra": "^11.1.1"
   },
   "devDependencies": {
     "jest": "^29.7.0",
