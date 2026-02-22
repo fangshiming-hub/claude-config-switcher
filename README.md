@@ -9,12 +9,9 @@ Claude 配置切换器是一个功能强大的命令行工具，用于在本地�
 
 - ✅ **智能配置扫描**：自动扫描当前目录中符合模式的配置文件
 - ✅ **多种使用方式**：支持交互式选择或命令行参数快速切换
-- ✅ **配置验证**：内置JSON语法和结构验证，确保配置文件有效性
-- ✅ **历史记录**：完整记录切换历史，支持回退操作
-- ✅ **配置比较**：可视化显示不同配置间的差异
+- ✅ **配置显示**：切换时显示前后配置内容，方便确认
 - ✅ **模板生成**：一键生成标准配置模板
 - ✅ **灵活定制**：支持自定义扫描模式和目标文件名
-- ✅ **安全备份**：自动备份原有配置，防止数据丢失
 
 ---
 
@@ -132,10 +129,15 @@ claude-config-switcher [envAlias] [options]
 
 ### 可选参数
 
-- `--pattern <glob>`：配置文件的匹配模式，默认 `settings-*.json`
-- `--target <filename>`：目标文件名，默认 `settings.json`
-- `--list`：只列出匹配的配置文件，不执行复制
+- `-p, --pattern <glob>`：配置文件的匹配模式，默认 `settings-*.json`
+- `-t, --target <filename>`：目标文件名，默认 `settings.json`
+- `-l, --list`：只列出匹配的配置文件，不执行复制
+- `-c, --current`：扫描当前目录
+- `-d, --dir <path>`：指定扫描目录
+- `--template`：生成配置模板
+- `-v, --verbose`：详细输出
 - `-h, --help`：显示帮助信息
+- `--version`：显示版本号
 
 ---
 
@@ -148,8 +150,8 @@ claude-config-switcher [envAlias] [options]
   - 直接按别名匹配文件名，还是
   - 使用 `prompts` 提供交互式选择
 - 对选中的配置文件：
-  - 先 `fs.readFile` 读取内容并用 `JSON.parse` 校验
-  - 校验通过后将原始内容写入目标文件（默认 `settings.json`）
+  - 将源配置文件复制到目标文件（默认 `settings.json`）
+  - 显示切换前后的配置内容
 - 输出切换结果和简单提示
 
 ---
@@ -175,28 +177,6 @@ npm run ccs:personal
 这样你只需要记住 `npm run ccs:xxx`，就可以在不同 Claude 配置之间快速切换。
 
 ## 🛠 增强功能详解
-
-### 配置验证
-```bash
-# 验证当前配置
-ccs --validate
-
-# 验证指定配置
-ccs --validate work
-```
-
-### 历史记录管理
-```bash
-# 查看切换历史
-ccs --show-history
-
-# 回退到上一个配置
-ccs --reset
-
-# 清除历史记录
-ccs --clear-history 7  # 清除7天前的历史
-ccs --clear-history    # 清除所有历史
-```
 
 ### 配置比较
 ```bash
@@ -239,14 +219,11 @@ ccs [envAlias] [options]
 选项：
   -p, --pattern        配置文件匹配模式 [默认: "settings-*.json"]
   -t, --target         目标文件名 [默认: "settings.json"]
-  -d, --default        默认扫描目录
+  -c, --current        扫描当前目录
+  -d, --dir            指定扫描目录
   -l, --list           仅列出匹配的配置文件
   -D, --diff           显示配置差异
-  -V, --validate       验证配置文件
       --template       生成配置模板
-      --show-history   查看切换历史
-      --reset          回退到上一个配置
-      --clear-history  清除历史记录
   -v, --verbose        详细输出
   -h, --help           显示帮助信息
   --version            显示版本号
@@ -277,8 +254,7 @@ ccs [envAlias] [options]
     "config:work": "ccs work",
     "config:personal": "ccs personal",
     "config:dev": "ccs dev",
-    "config:list": "ccs --list",
-    "config:validate": "ccs --validate"
+    "config:list": "ccs --list"
   }
 }
 ```
@@ -329,13 +305,10 @@ MIT License - 详见 LICENSE 文件
 A: 确保配置文件在当前目录下，且文件名符合 `settings-*.json` 模式
 
 **Q: 切换失败？**
-A: 检查源配置文件是否为有效JSON格式，使用 `--validate` 选项验证
+A: 检查源配置文件是否为有效JSON格式
 
 **Q: 权限错误？**
 A: 确保对目标目录有写入权限
-
-**Q: 历史记录不工作？**
-A: 历史记录存储在用户主目录下的 `.claude-config-switch/history.json`
 
 ### 获取帮助
 ```bash
