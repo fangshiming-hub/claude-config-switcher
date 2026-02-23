@@ -52,6 +52,11 @@ const argv = yargs(hideBin(process.argv))
     describe: '显示配置差异',
     type: 'boolean'
   })
+  .option('info', {
+    alias: 'i',
+    describe: '查看当前配置详情',
+    type: 'boolean'
+  })
   .option('validate', {
     alias: 'V',
     describe: '验证配置文件',
@@ -102,6 +107,8 @@ async function main() {
       await handleShowDiff(configManager);
     } else if (argv.validate) {
       await handleValidateConfig(configManager, argv.env);
+    } else if (argv.info) {
+      await handleShowCurrentConfigInfo(configManager);
     } else if (argv.env) {
       await handleSwitchByAlias(configManager, argv.env);
     } else {
@@ -303,6 +310,57 @@ async function handleValidateConfig(configManager, envAlias) {
   
   const validation = await Validator.validateConfigFile(configPath);
   console.log(Validator.generateValidationReport(validation));
+}
+
+/**
+ * 查看当前配置详情
+ */
+async function handleShowCurrentConfigInfo(configManager) {
+  const currentConfig = await configManager.getCurrentConfig();
+
+  if (!currentConfig) {
+    console.log(chalk.yellow('⚠️  未找到当前配置文件'));
+    console.log(chalk.gray(`目标文件: ${argv.target}`));
+    console.log(chalk.gray(`工作目录: ${configManager.workingDir}`));
+    return;
+  }
+
+  console.log(chalk.blue('\n📄 当前配置详情'));
+  console.log(chalk.gray('=================='));
+  console.log(chalk.green(`文件名: ${currentConfig.name}`));
+  console.log(chalk.gray(`路径: ${currentConfig.path}`));
+  console.log(chalk.gray(`大小: ${Utils.formatFileSize(currentConfig.size)}`));
+  console.log(chalk.gray(`修改时间: ${currentConfig.modified.toLocaleString('zh-CN')}`));
+
+  // 读取并显示配置内容
+  try {
+    const configData = await fs.readJson(currentConfig.path);
+    console.log(chalk.blue('\n📋 配置内容:'));
+    console.log(chalk.green(JSON.stringify(configData, null, 2)));
+
+    // 验证配置
+    const validation = Validator.validateClaudeConfig(configData);
+    console.log(chalk.blue('\n🔍 配置验证:'));
+    if (validation.isValid) {
+      console.log(chalk.green('✅ 配置结构有效'));
+    } else {
+      console.log(chalk.red('❌ 配置存在以下问题:'));
+      validation.errors.forEach(error => {
+        console.log(chalk.red(`  - ${error}`));
+      });
+    }
+
+    if (validation.warnings.length > 0) {
+      console.log(chalk.yellow('\n⚠️  警告:'));
+      validation.warnings.forEach(warning => {
+        console.log(chalk.yellow(`  - ${warning}`));
+      });
+    }
+  } catch (error) {
+    console.log(chalk.red(`\n❌ 无法读取配置内容: ${error.message}`));
+  }
+
+  console.log(); // 空行
 }
 
 /**
