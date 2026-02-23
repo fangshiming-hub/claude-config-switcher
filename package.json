@@ -1,6 +1,6 @@
 {
   "name": "@weishiren/claude-config-switcher",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "description": "A CLI tool for quickly switching between different Claude configuration files",
   "main": "lib/config-manager.js",
