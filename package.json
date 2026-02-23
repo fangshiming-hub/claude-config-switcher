@@ -20,7 +20,12 @@
     "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
     "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
     "lint": "eslint .",
-    "prepublishOnly": "npm test && npm run lint"
+    "prepublishOnly": "npm test && npm run lint",
+    "release": "npm run release:patch",
+    "release:patch": "npm run release:version -- patch",
+    "release:minor": "npm run release:version -- minor",
+    "release:major": "npm run release:version -- major",
+    "release:version": "node scripts/release.js"
   },
   "keywords": [
     "claude",

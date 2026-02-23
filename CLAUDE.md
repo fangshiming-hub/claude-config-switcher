@@ -27,7 +27,25 @@ npm run lint
 
 # Link for local testing
 npm link
+
+# Release commands
+npm run release          # Release patch version (1.0.0 -> 1.0.1)
+npm run release:patch    # Same as above
+npm run release:minor    # Release minor version (1.0.0 -> 1.1.0)
+npm run release:major    # Release major version (1.0.0 -> 2.0.0)
 ```
+
+### Release Process
+
+The release script (`scripts/release.js`) performs:
+1. Checks for uncommitted git changes
+2. Runs tests (`npm test`)
+3. Runs linting (`npm run lint`)
+4. Bumps version in package.json
+5. Commits the version change
+6. Creates git tag (e.g., `v1.0.1`)
+7. Pushes commit and tags to remote
+8. Publishes to npm
 
 ## Architecture
 
