@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Claude Config Switcher (`ccs`) is a CLI tool for switching between different Claude configuration files. It scans for `settings-*.json` files and copies the selected one to `settings.json` for use by Claude applications.
+Claude Config Switcher (`ccs`) is a CLI tool for switching between different Claude environment configurations. It manages a single config file `claudeEnvConfig.json` and switches by replacing the `env` field in `~/.claude/settings.json`.
 
 ## Development Commands
 
@@ -57,68 +57,90 @@ The release script (`scripts/release.js`) performs:
 ```
 bin/cli.js              # CLI entry point with yargs argument parsing
 lib/
-  config-manager.js     # Core class for scanning, switching, comparing configs
+  config-manager.js     # Core class for managing claudeEnvConfig.json and switching env
   utils.js              # Static utility class for file operations
-  validator.js          # JSON validation and Claude config schema validation
-  history-manager.js    # Tracks config switch history in ~/.claude-config-switch/
-templates/              # Config templates (settings-*.json samples)
+  validator.js           # JSON validation and config format validation
 __tests__/              # Jest test files
 ```
 
 ### Key Classes
 
 **ConfigManager** (`lib/config-manager.js`)
-- `scanConfigs()`: Scans directory for files matching the pattern
-- `switchConfig(source)`: Copies selected config to target file
-- `findConfigByAlias(envAlias)`: Matches alias to possible filenames
-- `compareConfigs(file1, file2)`: Deep diff between two config objects
-- `getCurrentConfig()`: Returns info about the target config file
+- `scanConfigs()`: Reads claudeEnvConfig.json, returns model name list
+- `switchConfig(modelName)`: Reads config, replaces settings.json's env field
+- `findConfigByAlias(modelName)`: Finds model by name
+- `getCurrentConfig()`: Returns info about the target config file including current env
+- `getEnvConfig(modelName)`: Gets env config for a specific model
 
 **Utils** (`lib/utils.js`)
-- Static utility methods for file scanning, path handling, formatting
-- `parseEnvAlias()`: Generates possible filenames from alias (e.g., `work` → `settings-work.json`, `settings-work`, `work.json`, `work`)
+- Static utility methods for file operations, path handling, formatting
 
 **Validator** (`lib/validator.js`)
-- `validateClaudeConfig()`: Validates config has required `env` object with `ANTHROPIC_API_KEY` and `ANTHROPIC_BASE_URL`
+- `validateClaudeConfig()`: Validates claudeEnvConfig.json format (object with model names as keys)
+- `validateEnvConfig()`: Validates env field structure in settings.json
 - `validateJsonString/File()`: Basic JSON validity checks
-
-**HistoryManager** (`lib/history-manager.js`)
-- Stores switch history in `~/.claude-config-switch/history.json`
-- Tracks timestamp, from/to files, environment, working directory
 
 ### Configuration File Format
 
-Config files are JSON with this structure:
+#### claudeEnvConfig.json
+Path: `~/.claude-config-switch/claudeEnvConfig.json`
+
 ```json
 {
-  "env": {
-    "ANTHROPIC_API_KEY": "your-key",
+  "work": {
+    "ANTHROPIC_API_KEY": "sk-xxx",
     "ANTHROPIC_BASE_URL": "https://api.anthropic.com",
     "ANTHROPIC_MODEL": "claude-3-sonnet-20240229"
   },
-  "temperature": 0.7,
-  "maxTokens": 1000,
-  "timeout": 30000
+  "personal": {
+    "ANTHROPIC_API_KEY": "sk-yyy",
+    "ANTHROPIC_BASE_URL": "https://custom-api.example.com"
+  }
 }
 ```
 
-### CLI Arguments
+#### settings.json (target file)
+Path: `~/.claude/settings.json`
 
-- `-p, --pattern <glob>`: Config file pattern (default: `settings-*.json`)
-- `-t, --target <filename>`: Target filename (default: `settings.json`)
-- `-c, --current`: Scan current directory instead of default
-- `-d, --dir <path>`: Specify scan directory
-- `-l, --list`: List configs without switching
-- `-i, --info`: Show current config details
-- `-D, --diff`: Compare two configs
-- `-V, --validate`: Validate config file
-- `--template`: Generate config template
+After switching, the `env` field is replaced:
+```json
+{
+  "env": {
+    "ANTHROPIC_API_KEY": "sk-xxx",
+    "ANTHROPIC_BASE_URL": "https://api.anthropic.com",
+    "ANTHROPIC_MODEL": "claude-3-sonnet-20240229"
+  }
+}
+```
+
+Other top-level fields in settings.json are preserved during switching.
+
+### CLI Commands
+
+```bash
+# Interactive mode - select from list
+ccs
+
+# Switch directly to a model
+ccs work
+
+# List all available models
+ccs -l
+ccs --list
+
+# Show current env configuration
+ccs -i
+ccs --info
+
+# Validate config file format
+ccs -V
+ccs --validate
+```
 
 ### Default Directories
 
-- Config directory: `~/.claude` (unless `-c` or `-d` specified)
-- History file: `~/.claude-config-switch/history.json`
-- Template directory: `<package_root>/templates/`
+- Config file: `~/.claude-config-switch/claudeEnvConfig.json`
+- Target file: `~/.claude/settings.json`
 
 ## Testing
 

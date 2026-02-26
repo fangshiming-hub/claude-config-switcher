@@ -14,28 +14,6 @@ describe('Utils', () => {
     });
   });
 
-  describe('parseEnvAlias', () => {
-    test('应该正确解析环境别名', () => {
-      const result = Utils.parseEnvAlias('work');
-      expect(result).toEqual([
-        'settings-work.json',
-        'settings-work',
-        'work.json',
-        'work'
-      ]);
-    });
-
-    test('应该支持自定义模式', () => {
-      const result = Utils.parseEnvAlias('dev', 'config-*.json');
-      expect(result).toEqual([
-        'config-dev.json',
-        'config-dev',
-        'dev.json',
-        'dev'
-      ]);
-    });
-  });
-
   describe('formatFileSize', () => {
     test('应该正确格式化字节大小', () => {
       expect(Utils.formatFileSize(0)).toBe('0 Bytes');
@@ -56,10 +34,25 @@ describe('Utils', () => {
     });
   });
 
-  describe('getTemplateDir', () => {
-    test('应该返回正确的模板目录', () => {
-      const result = Utils.getTemplateDir();
-      expect(result).toContain('templates');
+  describe('ensureDirectory', () => {
+    test('应该能创建目录', async () => {
+      const testDir = '/tmp/test-utils-dir-' + Date.now();
+      await Utils.ensureDirectory(testDir);
+      // 验证目录存在
+      const fs = await import('fs-extra');
+      const exists = await fs.pathExists(testDir);
+      expect(exists).toBe(true);
+      // 清理
+      await fs.remove(testDir);
+    });
+  });
+
+  describe('delay', () => {
+    test('应该延迟指定时间', async () => {
+      const start = Date.now();
+      await Utils.delay(100);
+      const elapsed = Date.now() - start;
+      expect(elapsed).toBeGreaterThanOrEqual(90); // 允许一些误差
     });
   });
 });

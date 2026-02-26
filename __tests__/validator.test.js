@@ -18,26 +18,15 @@ describe('Validator', () => {
   });
 
   describe('validateClaudeConfig', () => {
-    test('应该接受有效的Claude配置', () => {
+    test('应该接受有效的配置文件格式', () => {
       const config = {
-        env: {
+        work: {
           ANTHROPIC_API_KEY: 'test-key',
           ANTHROPIC_BASE_URL: 'https://api.anthropic.com'
         },
-        temperature: 0.7
-      };
-
-      const result = Validator.validateClaudeConfig(config);
-      expect(result.isValid).toBe(true);
-      expect(result.errors).toHaveLength(0);
-    });
-
-    test('应该接受包含可选ANTHROPIC_MODEL的配置', () => {
-      const config = {
-        env: {
-          ANTHROPIC_API_KEY: 'test-key',
-          ANTHROPIC_BASE_URL: 'https://api.anthropic.com',
-          ANTHROPIC_MODEL: 'claude-3-sonnet-20240229'
+        personal: {
+          ANTHROPIC_API_KEY: 'another-key',
+          ANTHROPIC_BASE_URL: 'https://custom-api.example.com'
         }
       };
 
@@ -46,130 +35,105 @@ describe('Validator', () => {
       expect(result.errors).toHaveLength(0);
     });
 
-    test('应该拒绝缺少env的配置', () => {
+    test('应该接受空的配置文件', () => {
+      const config = {};
+
+      const result = Validator.validateClaudeConfig(config);
+      expect(result.isValid).toBe(true);
+      expect(result.warnings).toContain('配置文件为空，没有定义任何模型');
+    });
+
+    test('应该拒绝非对象类型的配置', () => {
+      const result = Validator.validateClaudeConfig('invalid');
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain('配置必须是有效的 JSON 对象');
+    });
+
+    test('应该拒绝null类型的配置', () => {
+      const result = Validator.validateClaudeConfig(null);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain('配置必须是有效的 JSON 对象');
+    });
+
+    test('应该拒绝模型配置为非对象的情况', () => {
       const config = {
-        temperature: 0.7
+        work: 'invalid-string'
       };
 
       const result = Validator.validateClaudeConfig(config);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain('缺少 env 配置项');
+      expect(result.errors).toContain('模型 "work" 的配置必须是对象');
     });
 
-    test('应该拒绝env为非对象的配置', () => {
+    test('应该拒绝环境变量为非字符串的情况', () => {
       const config = {
-        env: 'invalid-string'
+        work: {
+          ANTHROPIC_API_KEY: 12345
+        }
       };
 
       const result = Validator.validateClaudeConfig(config);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain('模型 "work" 的环境变量 "ANTHROPIC_API_KEY" 必须是字符串');
+    });
+
+    test('应该接受多个有效模型配置', () => {
+      const config = {
+        work: {
+          ANTHROPIC_API_KEY: 'key1',
+          ANTHROPIC_BASE_URL: 'url1',
+          ANTHROPIC_MODEL: 'model1'
+        },
+        personal: {
+          API_KEY: 'key2'
+        },
+        dev: {
+          ANTHROPIC_API_KEY: 'key3'
+        }
+      };
+
+      const result = Validator.validateClaudeConfig(config);
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+  });
+
+  describe('validateEnvConfig', () => {
+    test('应该接受有效的env配置', () => {
+      const envConfig = {
+        ANTHROPIC_API_KEY: 'test-key',
+        ANTHROPIC_BASE_URL: 'https://api.anthropic.com'
+      };
+
+      const result = Validator.validateEnvConfig(envConfig);
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    test('应该接受null/undefined的env配置', () => {
+      let result = Validator.validateEnvConfig(null);
+      expect(result.isValid).toBe(true);
+      expect(result.warnings).toContain('当前没有设置 env 配置');
+
+      result = Validator.validateEnvConfig(undefined);
+      expect(result.isValid).toBe(true);
+      expect(result.warnings).toContain('当前没有设置 env 配置');
+    });
+
+    test('应该拒绝非对象类型的env配置', () => {
+      const result = Validator.validateEnvConfig('invalid-string');
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain('env 必须是对象类型');
     });
 
-    test('应该拒绝缺少ANTHROPIC_API_KEY的配置', () => {
-      const config = {
-        env: {
-          ANTHROPIC_BASE_URL: 'https://api.anthropic.com'
-        }
+    test('应该拒绝非字符串类型的环境变量', () => {
+      const envConfig = {
+        ANTHROPIC_API_KEY: 12345
       };
 
-      const result = Validator.validateClaudeConfig(config);
+      const result = Validator.validateEnvConfig(envConfig);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain('env 中缺少 ANTHROPIC_API_KEY 配置');
-    });
-
-    test('应该拒绝缺少ANTHROPIC_BASE_URL的配置', () => {
-      const config = {
-        env: {
-          ANTHROPIC_API_KEY: 'test-key'
-        }
-      };
-
-      const result = Validator.validateClaudeConfig(config);
-      expect(result.isValid).toBe(false);
-      expect(result.errors).toContain('env 中缺少 ANTHROPIC_BASE_URL 配置');
-    });
-
-    test('应该验证ANTHROPIC_API_KEY为字符串类型', () => {
-      const config = {
-        env: {
-          ANTHROPIC_API_KEY: 12345,
-          ANTHROPIC_BASE_URL: 'https://api.anthropic.com'
-        }
-      };
-
-      const result = Validator.validateClaudeConfig(config);
-      expect(result.isValid).toBe(false);
-      expect(result.errors).toContain('ANTHROPIC_API_KEY 必须是字符串类型');
-    });
-
-    test('应该验证ANTHROPIC_BASE_URL为字符串类型', () => {
-      const config = {
-        env: {
-          ANTHROPIC_API_KEY: 'test-key',
-          ANTHROPIC_BASE_URL: 12345
-        }
-      };
-
-      const result = Validator.validateClaudeConfig(config);
-      expect(result.isValid).toBe(false);
-      expect(result.errors).toContain('ANTHROPIC_BASE_URL 必须是字符串类型');
-    });
-
-    test('应该验证ANTHROPIC_MODEL为字符串类型', () => {
-      const config = {
-        env: {
-          ANTHROPIC_API_KEY: 'test-key',
-          ANTHROPIC_BASE_URL: 'https://api.anthropic.com',
-          ANTHROPIC_MODEL: 12345
-        }
-      };
-
-      const result = Validator.validateClaudeConfig(config);
-      expect(result.isValid).toBe(false);
-      expect(result.errors).toContain('ANTHROPIC_MODEL 必须是字符串类型');
-    });
-
-    test('应该验证timeout字段类型', () => {
-      const config = {
-        env: {
-          ANTHROPIC_API_KEY: 'test-key',
-          ANTHROPIC_BASE_URL: 'https://api.anthropic.com'
-        },
-        timeout: 'invalid-string'
-      };
-
-      const result = Validator.validateClaudeConfig(config);
-      expect(result.isValid).toBe(false);
-      expect(result.errors).toContain('timeout 必须是数字类型');
-    });
-  });
-
-  describe('checkConfigWarnings', () => {
-    test('应该检测温度范围警告', () => {
-      const config = {
-        env: {
-          ANTHROPIC_API_KEY: 'test-key',
-          ANTHROPIC_BASE_URL: 'https://api.anthropic.com'
-        },
-        temperature: 1.5
-      };
-
-      const warnings = Validator.checkConfigWarnings(config);
-      expect(warnings).toContain('temperature 建议在 0-1 范围内');
-    });
-
-    test('应该检测大token数警告', () => {
-      const config = {
-        env: {
-          ANTHROPIC_API_KEY: 'test-key',
-          ANTHROPIC_BASE_URL: 'https://api.anthropic.com'
-        },
-        maxTokens: 150000
-      };
-
-      const warnings = Validator.checkConfigWarnings(config);
-      expect(warnings).toContain('maxTokens 设置较大，可能产生高额费用');
+      expect(result.errors).toContain('环境变量 "ANTHROPIC_API_KEY" 必须是字符串');
     });
   });
 
@@ -180,7 +144,7 @@ describe('Validator', () => {
         errors: [],
         warnings: []
       };
-      
+
       const report = Validator.generateValidationReport(validationResult);
       expect(report).toContain('✅ 配置验证通过');
     });
@@ -191,7 +155,7 @@ describe('Validator', () => {
         errors: ['缺少必要字段'],
         warnings: []
       };
-      
+
       const report = Validator.generateValidationReport(validationResult);
       expect(report).toContain('❌ 配置验证失败');
       expect(report).toContain('缺少必要字段');
@@ -203,7 +167,7 @@ describe('Validator', () => {
         errors: [],
         warnings: ['这是一个警告']
       };
-      
+
       const report = Validator.generateValidationReport(validationResult);
       expect(report).toContain('⚠️  配置警告');
       expect(report).toContain('这是一个警告');
