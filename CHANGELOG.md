@@ -5,6 +5,48 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-02-26
+
+### Changed
+- **BREAKING**: Config format changed from multiple `settings-*.json` files to single `claudeEnvConfig.json`
+- **BREAKING**: Switching now replaces `env` field in `settings.json` instead of copying entire file
+- **BREAKING**: Config path is now `~/.claude-config-switch/claudeEnvConfig.json`
+- **BREAKING**: Simplified CLI commands - removed `-p/--pattern`, `-t/--target`, `-c/--current`, `-d/--dir`, `-D/--diff`, `--template` options
+
+### Removed
+- HistoryManager module (no longer needed)
+- Templates directory (no longer needed)
+- `compareConfigs()` method from ConfigManager
+- `formatConfigList()` method from ConfigManager
+- `scanConfigFiles()` function from Utils
+- `parseEnvAlias()` function from Utils
+- `getTemplateDir()` function from Utils
+
+### Added
+- New config file format with model names as keys
+- `validateEnvConfig()` method in Validator
+- `getEnvConfig()` method in ConfigManager
+- `getConfigFilePath()` method in ConfigManager
+- `getConfigDir()` method in ConfigManager
+
+### Migration Guide
+Old config format (multiple files):
+```
+~/.claude/
+├── settings-work.json
+├── settings-personal.json
+└── settings.json
+```
+
+New config format (single file):
+```json
+// ~/.claude-config-switch/claudeEnvConfig.json
+{
+  "work": { "ANTHROPIC_API_KEY": "...", ... },
+  "personal": { "ANTHROPIC_API_KEY": "...", ... }
+}
+```
+
 ## [1.0.0] - 2026-02-08
 
 ### Added
